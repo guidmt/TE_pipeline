@@ -24,7 +24,12 @@ print(i)
 
 as.numeric.factor <- function(x) {as.numeric(levels(x))[x]}
    
-table_blastn<-read_lines(blastn_table_name,skip=min(idx[[i]]),n_max=max(idx[[i]]))
+if(i==1){
+   table_blastn<-read_lines(blastn_table_name,skip=min(idx[[i]])-1,n_max=max(idx[[i]])-min(idx[[i]]))
+}else{
+   table_blastn<-read_lines(blastn_table_name,skip=min(idx[[i]]),n_max=max(idx[[i]])-min(idx[[i]]))
+}
+
 table_blastn<-data.frame(do.call(rbind,strsplit(table_blastn,split='\t')))
 table_blastn[,-c(1:2)]<-sapply( table_blastn[,-c(1:2)],as.numeric.factor)
 table_blastn[,c(1:2)]<-sapply( table_blastn[,(1:2)],as.character.factor)
