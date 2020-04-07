@@ -6,3 +6,5 @@ Provisional dependencies:
 - seqkit
 - R: readr, data.table
 - Perl
+- repeatmasker
+- abyssis
