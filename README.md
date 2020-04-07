@@ -4,5 +4,5 @@ Provisional dependencies:
 
 - blastn
 - seqkit
-- R 
-- perl
+- R: readr, data.table
+- Perl
