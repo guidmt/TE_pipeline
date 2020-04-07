@@ -1,6 +1,6 @@
 # TE_pipeline
  
-Provisional dependencies:
+Dependencies:
 
 - blastn
 - seqkit
