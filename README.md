@@ -17,3 +17,14 @@ bpipe  step1_te_pipeline.bpipe
 - Perl
 - repeatmasker
 - abyssis
+
+# Update:
+
+# To do list:
+General: create a config file for parameters (to check). To implement usage of arguments for each function in each stage. Improve chunks of code of step1_te_pipeline.bpipe
+
+07/04/2020: 
+- Complete step1_te_pipeline.bpipe
+- deduplicated_modern_flankings_and_filled_sites.R -> to improve
+- filtering_archaic_vs_modern_3prime.R  -> transform bash script
+- filtering_5prime_and_filled_sites _from modern_specific_3prime  -> to improve
