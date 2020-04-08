@@ -7,7 +7,7 @@
 
 bpipe  step1_te_pipeline.bpipe
 
-Dependencies:
+# Dependencies:
 - bpipe (last version, http://docs.bpipe.org)
 - blastn (last version)
 - seqkit (last version, https://github.com/shenwei356/seqkit)
