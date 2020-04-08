@@ -1,7 +1,9 @@
 # TE_pipeline
  
-Dependencies:
+# See wiki-page for details.
 
+Dependencies:
+- bpipe
 - blastn
 - seqkit
 - R: readr, data.table
