@@ -1,0 +1,174 @@
+// Pipeline TE
+
+//Directory with script
+DIRECTORY_UTILS="/SYNTAC/gmt/pipeline_eg/denisova/utils_good"
+
+//Define the name of your project
+DIRECTORY_PROJECT="/SYNTAC/gmt/pipeline_eg/test_denisova"
+
+//Specify the folder with the fasta of archaic (e.g. denisova)
+PATH_FASTA_ARCHAIC="/SYNTAC/gmt/pipeline_eg/denisova/data_small"
+
+//Specify the directory with the fasta of the reference genome (e.g. hs375d)
+FILE_REFERENCE="/SYNTAC/gmt/pipeline_eg/denisova/reference/hs37d5.fa"
+
+//Specify a file with the repegetive elements 
+FILE_RETRO="/SYNTAC/gmt/pipeline_eg/human_specific_active_non_ltr_retrotransposons_list_definitive.txt"
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Step 1: Create a folder with the project
+create_dir_project = {
+	exec "mkdir -p $DIRECTORY_PROJECT"
+}
+
+// Step 2: Create subdirectories for the project
+create_subdir_project_step1 = {
+        exec "mkdir -p $DIRECTORY_PROJECT/step1 $DIRECTORY_PROJECT/step1/processing/ $DIRECTORY_PROJECT/step1/results/ $DIRECTORY_PROJECT/step1/logs/"
+}
+
+create_subdir_project_step2 = {
+        exec "mkdir -p $DIRECTORY_PROJECT/step2 $DIRECTORY_PROJECT/step2/processing/ $DIRECTORY_PROJECT/step2/results/ $DIRECTORY_PROJECT/step2/logs/"
+}
+
+create_subdir_project_step3 = {
+        exec "mkdir -p $DIRECTORY_PROJECT/step3 $DIRECTORY_PROJECT/step3/processing/ $DIRECTORY_PROJECT/step3/results/ $DIRECTORY_PROJECT/step3/logs/"
+}
+
+//
+// Start Step1
+//
+
+// Step 1.2: Create indices fasta archaic
+blast_index_archaic = {
+
+  exec "for i in \$(ls $PATH_FASTA_ARCHAIC/*.fa);do makeblastdb -in $i -dbtype nucl;done"
+
+}
+
+// Step 1.3: Create indices of the reference
+blast_index_reference = {
+  exec "makeblastdb -in $FILE_REFERENCE -dbtype nucl"
+}
+
+
+// Step 1.4: Aligment fasta archaic with reference
+blast_alignment_archaic = {
+
+        exec """for faf in \$(ls $PATH_FASTA_ARCHAIC/*.fa);
+        do
+        faf_name=\$(basename \$faf .fa);
+        echo $faf_name;
+        echo $FILE_RETRO;
+        blastn -query $FILE_RETRO -perc_identity 95 -db $faf -task blastn -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen" -num_alignments 1000000000 -out $DIRECTORY_PROJECT/step1/processing/$faf_name".blasted_retrotrasposons";
+        done"""
+}
+
+// Step 1.5: Alignment retrotransposon list with reference
+
+blast_alignment_retro_ref={
+
+        exec """blastn -query $FILE_RETRO
+                -db $FILE_REFERENCE
+                -perc_identity 95
+                -out $DIRECTORY_PROJECT/step1/processing/reference_blasted_tab.txt
+                -task blastn -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen"
+                -num_alignments 1000000000
+                -num_threads 32
+             """
+}
+
+
+// Step 1.7: Convert the fasta of archaic in tab format with seqkit
+seqkit_archaic={
+	
+	exec """
+        for faf_to_convert in \$(ls $PATH_FASTA_ARCHAIC/*.fa);
+        do
+        faf_name_tab=\$(basename \$faf_to_convert .fa);
+        echo $faf_name_tab;
+        seqkit fx2tab $faf_to_convert > $DIRECTORY_PROJECT/step1/processing/$faf_name_tab".tab.fa";
+        done"""
+}
+
+// Step 1.8: sorting table fasta of archaic
+
+sort_blastn_and_join_archaic={
+	
+	exec """
+        for faf_to_join in \$(ls $DIRECTORY_PROJECT/step1/processing/*.tab.fa);
+        do
+        faf_name_tab=\$(basename \$faf_to_join .tab.fa);
+        echo $faf_name_tab;
+        (export LC_ALL=C; join -1 2 -2 1 <(sort -k 2 $DIRECTORY_PROJECT/step1/processing/$faf_name_tab".blasted_retrotrasposons") <(sort -k 1 $faf_to_join)| tr ' ' '\t' > $DIRECTORY_PROJECT/step1/processing/$faf_name_tab".blast_alignment.final")
+	done"""
+}
+
+
+// Step 1.9: filtering_3prime_from_blast_archaic_definitive.R
+
+filtering_3prime_from_blast_archaic_definitive={
+
+        output.dir="$DIRECTORY_PROJECT/step1/processing/"
+
+	exec """
+	
+	for final_fa in \$(ls $DIRECTORY_PROJECT/step1/processing/*.blast_alignment.final);
+	do
+	faf_final_fa=\$(basename \$final_fa .tab.fa);
+	echo $final_fa;
+	echo $faf_final_fa;
+	Rscript $DIRECTORY_UTILS/filtering_3prime_from_blast_archaic_definitive.R $final_fa 30 25 30 $output.dir/$faf_final_fa;
+	done"""
+}
+
+// Step 2.0: concatenate the results from 1.9
+
+cat_output_3prime_blast_archaic={
+
+        output.dir="$DIRECTORY_PROJECT/step1/processing/"
+
+	exec """
+	cat $DIRECTORY_PROJECT/step1/processing/*_3prime_sense.fa > $output_dir/archaic_3prime_sense.fa;
+	cat $DIRECTORY_PROJECT/step1/processing/*_3prime_antisense.fa > $output_dir/archaic_3prime_antisense.fa;
+	cat $DIRECTORY_PROJECT/step1/processing/*_3prime_flanking_sense.fa > $output_dir/archaic_3prime_flanking_sense.fa;
+	cat $DIRECTORY_PROJECT/step1/processing/*_3prime_flanking_antisense.fa > $output_dir/archaic_3prime_flanking_antisense.fa;
+	"""
+}
+
+
+// Step 2.1: filtering_3prime_from_blast_modern_definitive
+
+filtering_3prime_from_blast_modern_definitive={
+	
+	output.dir="$DIRECTORY_PROJECT/step1/processing/"
+
+	exec """
+	Rscript $DIRECTORY_UTILS/filtering_3prime_from_blast_modern_definitive.R $DIRECTORY_PROJECT/step1/processing/reference_blasted_tab.txt 30 25 30 100 $output.dir/modern
+	"""
+	
+}
+
+// Step 2.2: fasta_reference_portion_VariableLength.pl
+
+fasta_reference_portion_variablelength={
+
+	exec """
+        perl $DIRECTORY_UTILS/fasta_reference_portion_VariableLength_new.pl $DIRECTORY_PROJECT/step1/processing/modern_3prime_sense_pos.txt modern_3prime_flanking_sense.fa down
+        perl $DIRECTORY_UTILS/fasta_reference_portion_VariableLength_new.pl $DIRECTORY_PROJECT/step1/processing/modern_3prime_antisense_pos.txt $output.dir/modern_3prime_flanking_antisense.fa up;
+        perl $DIRECTORY_UTILS/fasta_reference_portion_VariableLength_new.pl $DIRECTORY_PROJECT/step1/processing/modern_5prime_sense_pos.txt $output.dir/modern_5prime_flanking_sense.fa down;
+        perl $DIRECTORY_UTILS/fasta_reference_portion_VariableLength_new.pl $DIRECTORY_PROJECT/step1/processing/modern_5prime_antisense_pos.txt $output.dir/modern_5prime_flanking_antisense.fa up;
+        perl $DIRECTORY_UTILS/fasta_reference_portion_VariableLength_new.pl $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_sense_pos.txt $output.dir/modern_filled_sites_sense.fa down;
+        perl $DIRECTORY_UTILS/fasta_reference_portion_VariableLength_new.pl $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_antisense_pos.txt $output.dir/modern_filled_sites_antisense.fa up;
+	"""
+}
+
+
+Bpipe.run{
+
+//create_subdir_project_step1+create_subdir_project_step2+create_subdir_project_step3+blast_index_archaic+blast_index_reference+blast_alignment_archaic+blast_alignment_retro_ref+seqkit_archaic+seqkit_archaic+sort_blastn_and_join_archaic+filtering_3prime_from_blast_archaic_definitive+cat_output_3prime_blast_archaic+filtering_3prime_from_blast_modern_definitive
+
+fasta_reference_portion_variablelength
+
+}
+
