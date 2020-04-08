@@ -21,7 +21,7 @@ bpipe  step1_te_pipeline.bpipe
 # Update:
 
 # To do list:
-General: create a config file for parameters (to check). To implement usage of arguments for each function in each stage. Improve chunks of code of step1_te_pipeline.bpipe
+General: create a config file with parameters (to check). To implement usage of arguments for each function in each stage. Improve chunks of code of step1_te_pipeline.bpipe
 
 07/04/2020: 
 - Complete step1_te_pipeline.bpipe
