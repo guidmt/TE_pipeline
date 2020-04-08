@@ -5,7 +5,9 @@
 2) Configure the parameters of *.bpipe files 
 3) Run:
 
+```bash
 bpipe  step1_te_pipeline.bpipe
+```
 
 # Dependencies:
 - bpipe (last version, http://docs.bpipe.org)
