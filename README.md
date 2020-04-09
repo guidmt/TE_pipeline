@@ -9,6 +9,9 @@
 bpipe  step1_te_pipeline.bpipe
 ```
 
+![Denisova]
+(https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Известная_на_весь_Мир_Денисова_пещера._01.jpg/1920px-Известная_на_весь_Мир_Денисова_пещера._01.jpg)
+
 # Dependencies:
 - bpipe (last version, http://docs.bpipe.org)
 - blastn (last version)
