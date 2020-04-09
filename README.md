@@ -19,6 +19,8 @@ bpipe  step1_te_pipeline.bpipe
 - abyssis
 
 # Update:
+- add stages pipeline
+- deduplicated_modern_flankings_and_filled_sites.R > converted bash command
 
 # To do list:
 General: create a config file with parameters (to check). To implement usage of arguments for each function in each stage. Optimize some chunks of code of step1_te_pipeline.bpipe
