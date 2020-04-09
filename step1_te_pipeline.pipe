@@ -163,12 +163,97 @@ fasta_reference_portion_variablelength={
 	"""
 }
 
+// Step 2.4: remove duplicates
+remove_duplicates_flankings_and_filled_sites={
+
+	exec """
+	
+	seqkit fx2tab $DIRECTORY_PROJECT/step1/processing/modern_3prime_flanking_sense.fa | awk -F'\t' '!seen[$1]++'| seqkit tab2fx|seqkit tab2fx > $DIRECTORY_PROJECT/step1/processing/modern_3prime_flanking_sense.fa;
+	seqkit fx2tab $DIRECTORY_PROJECT/step1/processing/modern_5prime_flanking_sense.fa | awk -F'\t' '!seen[$1]++'| seqkit tab2fx|seqkit tab2fx > $DIRECTORY_PROJECT/step1/processing/modern_5prime_flanking_sense.fa;
+        seqkit fx2tab $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_sense_pos.txt | awk -F'\t' '!seen[$1]++'| seqkit tab2fx|seqkit tab2fx > $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_sense_pos.txt;
+
+        seqkit fx2tab $DIRECTORY_PROJECT/step1/processing/modern_3prime_flanking_antisense.fa | awk -F'\t' '!seen[$1]++'| seqkit tab2fx|seqkit tab2fx > $DIRECTORY_PROJECT/step1/processing/modern_3prime_flanking_antisense.fa;
+        seqkit fx2tab $DIRECTORY_PROJECT/step1/processing/modern_5prime_flanking_antisense.fa | awk -F'\t' '!seen[$1]++'| seqkit tab2fx|seqkit tab2fx > $DIRECTORY_PROJECT/step1/processing/modern_5prime_flanking_antisense.fa;
+        seqkit fx2tab $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_antisense_pos.txt | awk -F'\t' '!seen[$1]++'| seqkit tab2fx|seqkit tab2fx > $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_antisense_pos.txt;
+
+	"""
+
+	}
+
+// Step 2.4: Create index flanking sense archaic
+
+blast_index_flank_archaic={
+	
+	exec """
+	makeblastdb -in $DIRECTORY_PROJECT/step1/processing/archaic_3prime_flanking_sense.fa -dbtype nucl	
+	"""
+
+	}
+
+// Step 2.5:  blast flanking sense with sense modern and archaic
+
+blast_flanking_sense_modern_archaic={
+	
+	exec """
+	blastn -query $DIRECTORY_PROJECT/step1/processing/modern_3prime_flanking_sense.fa 
+	-db $DIRECTORY_PROJECT/step1/processing/archaic_insertions_3prime_flanking_sense.fa 
+	-task blastn 
+	-perc_identity 90 
+	-outfmt 6 
+	-num_alignments 1000000000 
+	-num_threads 20 
+	-out $DIRECTORY_PROJECT/step1/processing/modern_archaic_blasted_3prime_flanking_sense.txt
+	"""
+	}
+
+// Step 2.6:  blast flanking antisense with antisense modern and archaic
+
+blast_flanking_antisense_modern_archaic={
+
+        exec """
+        blastn -query $DIRECTORY_PROJECT/step1/processing/modern_3prime_flanking_antisense.fa
+        -db $DIRECTORY_PROJECT/step1/processing/archaic_flanking_3prime_flanking_antisense.fa
+        -task blastn 
+        -perc_identity 90 
+        -outfmt 6 
+        -num_alignments 1000000000 
+        -num_threads 20 
+        -out $DIRECTORY_PROJECT/step1/processing/modern_archaic_blasted_3prime_flanking_antisense.txt
+        """
+        }
+
+// Step 2.7: filtering archaic vs modern
+
+filtering_archaic_vs_modern={
+
+	exec """
+
+	function filter_archaic_vs_modern(){
+
+	sequences_to_exclude=$(less $1 |awk '{if ($4 >=25){print}}'|cut -f 1|sed 's/>//g')
+	seqkit fx2tab $2 |grep -v "sequences_to_exclude" | seqkit tab2fx
+
+	}
+
+	filter_archaic_vs_modern $DIRECTORY_PROJECT/step1/processing/modern_archaic_blasted_3prime_flanking_sense.txt $DIRECTORY_PROJECT/step1/processing/archaic_3prime_sense.fa > $DIRECTORY_PROJECT/step1/processing/putative_archaic_specific_3prime_reads_sense.fa;
+
+	filter_archaic_vs_modern $DIRECTORY_PROJECT/step1/processing/modern_archaic_blasted_3prime_flanking_antisense.txt $DIRECTORY_PROJECT/step1/processing/archaic_3prime_antisense.fa > $DIRECTORY_PROJECT/step1/processing/putative_archaic_specific_3prime_reads_antisense.fa;
+
+	filter_archaic_vs_modern $DIRECTORY_PROJECT/step1/processing/modern_archaic_blasted_3prime_flanking_sense.txt $DIRECTORY_PROJECT/step1/processing/archaic_3prime_flanking_sense.fa > $DIRECTORY_PROJECT/step1/processing/putative_archaic_specific_3prime_flanking_sense.fa;
+
+	filter_archaic_vs_modern $DIRECTORY_PROJECT/step1/processing/modern_archaic_blasted_3prime_flanking_sense.txt $DIRECTORY_PROJECT/step1/processing/archaic_3prime_flanking_antisense.fa > $DIRECTORY_PROJECT/step1/processing/putative_archaic_specific_3prime_flanking_antisense.fa;
+
+	filter_archaic_vs_modern $DIRECTORY_PROJECT/step1/processing/modern_archaic_blasted_3prime_flanking_sense.txt $DIRECTORY_PROJECT/step1/processing/modern_archaic_blasted_3prime_flanking_sense.txt > $DIRECTORY_PROJECT/step1/processing/putative_modern_specific_3prime_flanking_sense.fa;
+
+	filter_archaic_vs_modern $DIRECTORY_PROJECT/step1/processing/modern_archaic_blasted_3prime_flanking_antisense.txt	$DIRECTORY_PROJECT/step1/processing/modern_archaic_blasted_3prime_flanking_antisense.txt > $DIRECTORY_PROJECT/step1/processing/putative_modern_specific_3prime_flanking_antisense.fa
+ 	
+	"""
 
 Bpipe.run{
 
-//create_subdir_project_step1+create_subdir_project_step2+create_subdir_project_step3+blast_index_archaic+blast_index_reference+blast_alignment_archaic+blast_alignment_retro_ref+seqkit_archaic+seqkit_archaic+sort_blastn_and_join_archaic+filtering_3prime_from_blast_archaic_definitive+cat_output_3prime_blast_archaic+filtering_3prime_from_blast_modern_definitive
+//create_subdir_project_step1+create_subdir_project_step2+create_subdir_project_step3+blast_index_archaic+blast_index_reference+blast_alignment_archaic+blast_alignment_retro_ref+seqkit_archaic+seqkit_archaic+sort_blastn_and_join_archaic+filtering_3prime_from_blast_archaic_definitive+cat_output_3prime_blast_archaic+filtering_3prime_from_blast_modern_definitive+fasta_reference_portion_variablelength
 
-fasta_reference_portion_variablelength
+remove_duplicates_flankings_and_filled_sites+blast_index_flank_archaic+blast_flanking_sense_modern_archaic+blast_flanking_antisense_modern_archaic
 
 }
 
