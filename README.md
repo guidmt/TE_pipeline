@@ -9,6 +9,7 @@
 bpipe  step1_te_pipeline.bpipe
 ```
 
+
 # Dependencies:
 - bpipe (last version, http://docs.bpipe.org)
 - blastn (last version)
@@ -19,7 +20,7 @@ bpipe  step1_te_pipeline.bpipe
 - abyssis
 
 # Update:
-07/04/2020: 
+08/04/2020: 
 - add stages pipeline
 - deduplicated_modern_flankings_and_filled_sites.R > converted bash 
 - filtering_archaic_vs_modern_3prime.R >  converted bash 
