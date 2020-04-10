@@ -20,6 +20,10 @@ bpipe  step1_te_pipeline.bpipe
 - abyssis
 
 # Update:
+09/02/2020:
+- seqkit now split the reference genome by chromosome
+- changed script fasta_reference_portion2.pl, add argument (path reference), to identiy the folders with the fasta for each chromosomes and extract the sequences. 
+
 08/04/2020: 
 - add stages pipeline
 - deduplicated_modern_flankings_and_filled_sites.R > converted bash 
