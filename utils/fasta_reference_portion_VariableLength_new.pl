@@ -5,6 +5,7 @@ use strict;
 # ARGV[0]=poslist (tab separated chr\tpos\tlength\n)
 # ARGV[1]=output name.fasta
 # ARGV[2]= up or down
+# ARGV[3]= directory fasta reference
 
 my $i;
 my $j;
@@ -14,6 +15,34 @@ my @chrlines;
 my $string="";
 my $length_var="";
 
+my $find = ".fa";
+my $replace = ".fa.split";
+
+my $dir_reference = $ARGV[3];
+
+print $dir_reference . "\n";
+
+# Replace .fa in .fa.split,seqkit create a folder in the follow format "name_genome.fa.split"
+(my $dir_reference_clean = $dir_reference) =~ s/$find/$replace/g;
+
+print $dir_reference_clean . "\n";
+
+# take the last element of the split, is the name of the genome provided by bpipe
+
+my $genome=(split('/',$dir_reference))[-1];
+print $genome ."\n";
+
+#remove the format file .fa
+$genome =~ s/$find//g;
+
+print $genome . "\n";
+
+my $genome2 = $genome.".id_";
+
+print $genome2;
+
+###############
+
 open (OUT, ">$ARGV[1]");
 my $chr="-999";
 my $pos;
@@ -22,10 +51,17 @@ my @snplines= <SNPS>;
 chomp @snplines;
 
 for $i (0 .. $#snplines){
-    #print STDERR "hey! $i\n";
+
     my @splitsnp= split (/\s+/, $snplines[$i]);
-    if ($splitsnp[0] ne $chr){
-	my $file="MyNewChr".$splitsnp[0].".fasta";
+    
+	if ($splitsnp[0] ne $chr){
+
+	print $genome2 . "\n";
+
+	my $file=$dir_reference_clean."/".$genome2.$splitsnp[0].".fa";
+
+	print $file . "\n";
+
 	$chr=$splitsnp[0];
 	$string="";
 	open (CHR, "<$file");
