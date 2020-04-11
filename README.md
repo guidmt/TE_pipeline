@@ -12,10 +12,11 @@ bpipe  step1_te_pipeline.bpipe
 ```bash
 tmux new -s step1_te_pipeline
 bpipe  step1_te_pipeline.bpipe
+bpipe  step1_te_pipeline.bpipe
 ctrl+b+d
 
 recover session:
-tmux attach-session -t step1_te_pipeline
+tmux attach-session -t step*_te_pipeline
 ```
 
 # Dependencies:
