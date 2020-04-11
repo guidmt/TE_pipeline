@@ -8,7 +8,15 @@
 ```bash
 bpipe  step1_te_pipeline.bpipe
 ```
+# How to background:
+```bash
+tmux new -s step1_te_pipeline
+bpipe  step1_te_pipeline.bpipe
+ctrl+b (yes)
 
+recover session:
+tmux attach-session -t step1_te_pipeline
+```
 
 # Dependencies:
 - bpipe (last version, http://docs.bpipe.org)
