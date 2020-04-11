@@ -45,12 +45,14 @@ tmux attach-session -t step1_te_pipeline
 # To do list:
 General: create a config file with parameters (to check). To implement usage of arguments for each function in each stage. Optimize some chunks of code of step1_te_pipeline.bpipe
 
-08/04/2020:
-- to complete step1_te_pipeline.bpipe
-- filtering_5prime_and_filled_sites _from modern_specific_3prime  -> to improve
+10/04/2020:
+- step2: optimize R scripts, add stages pipeline
+- add the possibility to upload the paramters from a tab both from step1 and step2
+- improvers some steps step1
 
-07/04/2020: 
-- to complete step1_te_pipeline.bpipe
+07/04/2020-Now: 
+- filtering_5prime_and_filled_sites _from modern_specific_3prime  DONE
+- to complete step1_te_pipeline.bpipe DONE 
 - deduplicated_modern_flankings_and_filled_sites.R -> to improve DONE
 - filtering_archaic_vs_modern_3prime.R  -> transform bash script DONE
 - filtering_5prime_and_filled_sites _from modern_specific_3prime  -> to improve
