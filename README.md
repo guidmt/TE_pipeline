@@ -7,16 +7,16 @@
 
 ```bash
 bpipe  step1_te_pipeline.bpipe
+bpipe  step2_te_pipeline.bpipe
 ```
 ## Run background:
 ```bash
 tmux new -s step1_te_pipeline
 bpipe  step1_te_pipeline.bpipe
-bpipe  step1_te_pipeline.bpipe
 ctrl+b+d
 
 recover session:
-tmux attach-session -t step*_te_pipeline
+tmux attach-session -t step1_te_pipeline
 ```
 
 # Dependencies:
