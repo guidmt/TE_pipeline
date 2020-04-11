@@ -8,7 +8,7 @@
 ```bash
 bpipe  step1_te_pipeline.bpipe
 ```
-# How to background:
+## Run background:
 ```bash
 tmux new -s step1_te_pipeline
 bpipe  step1_te_pipeline.bpipe
