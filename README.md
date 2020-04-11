@@ -30,7 +30,7 @@ tmux attach-session -t step1_te_pipeline
 # Update:
 09/02/2020:
 - seqkit now split the reference genome by chromosome
-- changed script fasta_reference_portion2.pl, add argument (path reference), to identiy the folders with the fasta for each chromosomes and extract the sequences. 
+- changed script fasta_reference_portion2.pl, add argument (path reference), to identiy the folder with the fasta for each chromosome and extract the sequences. 
 
 08/04/2020: 
 - add stages pipeline
