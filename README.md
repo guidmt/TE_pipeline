@@ -29,7 +29,11 @@ tmux attach-session -t step1_te_pipeline
 - abyssis
 
 # Update:
-09/02/2020:
+10/04/2020:
+- create draft step2 pipeline: step2_te_pipeline.bpipe
+- filtering_5prime_and_filled_sites_from modern_specific_3prime.R > converted in bash 
+
+09/04/2020:
 - seqkit now split the reference genome by chromosome
 - changed script fasta_reference_portion2.pl, add argument (path reference), to identiy the folder with the fasta for each chromosome and extract the sequences. 
 
