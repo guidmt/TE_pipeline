@@ -7,7 +7,7 @@ DIRECTORY_UTILS="/SYNTAC/gmt/pipeline_eg/denisova/utils_good"
 DIRECTORY_PROJECT="/SYNTAC/gmt/pipeline_eg/test_denisova"
 
 //Specify the folder with the fasta of archaic (e.g. denisova)
-PATH_FASTA_ARCHAIC="/SYNTAC/gmt/pipeline_eg/denisova/data_small"
+PATH_FASTA_ARCHAIC="/SYNTAC/gmt/pipeline_eg/denisova/data"
 
 //Specify the directory with the fasta of the reference genome (e.g. hs375d)
 FILE_REFERENCE="/SYNTAC/gmt/pipeline_eg/denisova/reference/hs37d5.fa"
@@ -269,10 +269,10 @@ filtering_5prime_and_filled_sites_from_modern_specific_3prime={
 	seqkit fx2tab $DIRECTORY_PROJECT/step1/processing/modern_5prime_flanking_sense.fa |tr ':' '\t'|tr '-' '\t' > $DIRECTORY_PROJECT/step1/processing/modern_5prime_flanking_sense.tab.fa;
 
 	//filled SENSE FS - 3prime
-	join -j 3 <(sort $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_sense.tab.fa) <(sort $DIRECTORY_PROJECT/step1/results/modern_specific_3prime_flanking_sense.fa)|tr '' '\t'|cut -f 1,2,3,4|sort|awk -v OFS="" '{print $2,":",$1,"-",$3,"\t",$4}'|seqkit tab2fx > $DIRECTORY_PROJECT/step1/results/modern_specific_filled_sites_sense.fa;
+	join -j 3 <(sort $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_sense.tab.fa) <(sort $DIRECTORY_PROJECT/step1/results/modern_specific_3prime_flanking_sense.fa)|tr '' '\t'|cut -f 1,2,3,4|sort|awk -v OFS="" '{print \$2,":",\$1,"-",\$3,"\t",\$4}'|seqkit tab2fx > $DIRECTORY_PROJECT/step1/results/modern_specific_filled_sites_sense.fa;
 
 	//filled SENSE FS - 5prime
-	join -j 2 <(sort $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_sense.tab.fa) <(sort $DIRECTORY_PROJECT/step1/results/modern_specific_3prime_flanking_sense.fa)|tr '' '\t'|cut -f 1,2,3,4|sort|awk -v OFS="" '{print $2,":",$1,"-",$3,"\t",$4}'|seqkit tab2fx > $DIRECTORY_PROJECT/step1/results/modern_specific_5prime_flanking_sense.fa;
+	join -j 2 <(sort $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_sense.tab.fa) <(sort $DIRECTORY_PROJECT/step1/results/modern_specific_3prime_flanking_sense.fa)|tr '' '\t'|cut -f 1,2,3,4|sort|awk -v OFS="" '{print \$2,":",\$1,"-",\$3,"\t",\$4}'|seqkit tab2fx > $DIRECTORY_PROJECT/step1/results/modern_specific_5prime_flanking_sense.fa;
 	
 	seqkit fx2tab $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_antisense.fa |tr ':' '\t'|tr '-' '\t' > $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_antisense.tab.fa;
 
@@ -281,19 +281,18 @@ filtering_5prime_and_filled_sites_from_modern_specific_3prime={
 	seqkit fx2tab $DIRECTORY_PROJECT/step1/processing/modern_5prime_flanking_antisense.fa |tr ':' '\t'|tr '-' '\t' > $DIRECTORY_PROJECT/step1/processing/modern_5prime_flanking_antisense.tab.fa;
 
 	//filled ANTISENSE FS - 3prime
-        join -j 2 <(sort $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_antisense.tab.fa) <(sort $DIRECTORY_PROJECT/step1/results/modern_specific_3prime_flanking_antisense.fa)|tr '' '\t'|cut -f 1,2,3,4|sort|awk -v OFS="" '{print $2,":",$1,"-",$3,"\t",$4}'|seqkit tab2fx > $DIRECTORY_PROJECT/step1/results/modern_specific_filled_sites_antisense.fa;
+        join -j 2 <(sort $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_antisense.tab.fa) <(sort $DIRECTORY_PROJECT/step1/results/modern_specific_3prime_flanking_antisense.fa)|tr '' '\t'|cut -f 1,2,3,4|sort|awk -v OFS="" '{print \$2,":",\$1,"-",\$3,"\t",\$4}'|seqkit tab2fx > $DIRECTORY_PROJECT/step1/results/modern_specific_filled_sites_antisense.fa;
 
         //filled ANTISENSE FS - 5prime
-        join -j 3 <(sort $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_antisense.tab.fa) <(sort $DIRECTORY_PROJECT/step1/results/modern_specific_3prime_flanking_antisense.fa)|tr '' '\t'|cut -f 1,2,3,4|sort|awk -v OFS="" '{print $2,":",$1,"-",$3,"\t",$4}'|seqkit tab2fx > $DIRECTORY_PROJECT/step1/results/modern_specific_5prime_flanking_antisense.fa;
+        join -j 3 <(sort $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_antisense.tab.fa) <(sort $DIRECTORY_PROJECT/step1/results/modern_specific_3prime_flanking_antisense.fa)|tr '' '\t'|cut -f 1,2,3,4|sort|awk -v OFS="" '{print \$2,":",\$1,"-",\$3,"\t",\$4}'|seqkit tab2fx > $DIRECTORY_PROJECT/step1/results/modern_specific_5prime_flanking_antisense.fa;
 
 	"""
 }
 
 Bpipe.run{
 
-//create_subdir_project_step1+create_subdir_project_step2+create_subdir_project_step3+blast_index_archaic+blast_index_reference+blast_alignment_archaic+blast_alignment_retro_ref+seqkit_archaic+seqkit_archaic+sort_blastn_and_join_archaic+filtering_3prime_from_blast_archaic_definitive
-
-cat_output_3prime_blast_archaic+filtering_3prime_from_blast_modern_definitive+fasta_reference_portion_variablelength
+//create_subdir_project_step1+create_subdir_project_step2+create_subdir_project_step3+
+blast_index_archaic+blast_index_reference+blast_alignment_archaic+blast_alignment_retro_ref+seqkit_archaic+seqkit_archaic+sort_blastn_and_join_archaic+filtering_3prime_from_blast_archaic_definitive+cat_output_3prime_blast_archaic+filtering_3prime_from_blast_modern_definitive+fasta_reference_portion_variablelength
 
 //remove_duplicates_flankings_and_filled_sites+blast_index_flank_archaic+blast_flanking_sense_modern_archaic+blast_flanking_antisense_modern_archaic+filtering_5prime_and_filled_sites_from_modern_specific_3prime
 
