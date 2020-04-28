@@ -28,7 +28,10 @@ tmux attach-session -t step1_te_pipeline
 - repeatmasker
 - abyssis
 
-# Update:
+# Updates:
+28/04/2020
+- added and removed stages step2_te_pipeline.bpipe
+
 10/04/2020:
 - created draft step2 pipeline: step2_te_pipeline.bpipe
 - filtering_5prime_and_filled_sites_from modern_specific_3prime.R > converted in bash 
@@ -47,7 +50,7 @@ General: create a config file with parameters (to check). To implement usage of 
 
 10/04/2020:
 - step2: optimize R scripts, add stages pipeline
-- add the possibility to upload the paramters from a tab both from step1 and step2
+- add the possibility to upload the parameters from a tab both from step1 and step2
 - improvers some steps step1
 
 07/04/2020-Now: 
