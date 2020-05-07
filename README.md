@@ -26,13 +26,14 @@ tmux attach-session -t step1_te_pipeline
 - R: readr, data.table
 - Perl
 - repeatmasker
-- abyssis
+- abyssis [to check]
 
 # Updates:
 07/05/2020
 - update step2 bpipe
 - add filtering_5prime_from_blast_archaic_v2.R
 - add generate_longer_reads_from_blasted_db_archaic.R
+- improve speed some stages step1 
 
 28/04/2020
 - added and removed stages step2_te_pipeline.bpipe
