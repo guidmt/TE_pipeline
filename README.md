@@ -48,6 +48,10 @@ tmux attach-session -t step1_te_pipeline
 # To do list:
 General: create a config file with parameters (to check). To implement usage of arguments for each function in each stage. Optimize some chunks of code of step1_te_pipeline.bpipe
 
+07/05/2020:
+- check script R stages 2 (debug)
+- add stages step2 - seqkit 
+
 10/04/2020:
 - step2: optimize R scripts, add stages pipeline
 - add the possibility to upload the parameters from a tab both from step1 and step2
