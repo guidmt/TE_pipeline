@@ -17,6 +17,7 @@ FILE_RETRO="/SYNTAC/gmt/pipeline_eg/human_specific_active_non_ltr_retrotransposo
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//step 2.1 blastn putative archaic
 blastn_putative_archaic_specific_3prime_flanking_sense={
 	
 	exec """
@@ -34,16 +35,25 @@ blastn_putative_archaic_specific_3prime_flanking_sense={
 
 preprocessing_generate_longer_reads={
 	exec """
-
-	seqkit fx2tab $DIRECTORY_PROJECT/step2/processing/blasted_3prime_flanking_for_generate_longer_reads_sense.txt > $DIRECTORY_PROJECT/step2/processing/blasted_3prime_flanking_for_generate_longer_reads_sense.tab.txt;
 	seqkit fx2tab $DIRECTORY_PROJECT/step1/results/putative_archaic_specific_3prime_flanking_sense.fa > $DIRECTORY_PROJECT/step1/results/putative_archaic_specific_3prime_flanking_sense.tab.fa
 	"""
 
 }
+
+
+
+join_blastn_and_fa={
+	
+	exec """
+        (export LC_ALL=C; join -1 2 -2 1 <(sort -k 2 $DIRECTORY_PROJECT/step2/processing/blasted_3prime_flanking_for_generate_longer_reads_sense.txt") <(sort -k 1 $DIRECTORY_PROJECT/step1/processing/putative_archaic_specific_3prime_flanking_sense.tab.fa)| tr ' ' '\t' > $DIRECTORY_PROJECT/step2/processing/blasted_3prime_flanking_for_generate_longer_reads_sense.input.txt")
+	done"""
+}
+
+
 generate_longer_reads_from_blasted_db_archaic={
 	
 	exec """
-	Rscript $DIRECTORY_UTILS/generate_longer_reads_from_blasted_db_archaic.R $DIRECTORY_PROJECT/step2/processing/blasted_3prime_flanking_for_generate_longer_reads_sense.tab.txt $DIRECTORY_PROJECT/step1/results/putative_archaic_specific_3prime_flanking_sense.fa 3prime sense flankings 25 $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_3prime_flankings_sense_assembled.fa
+	Rscript $DIRECTORY_UTILS/generate_longer_reads_from_blasted_db_archaic.R $DIRECTORY_PROJECT/step2/processing/blasted_3prime_flanking_for_generate_longer_reads_sense.input.txt 3prime sense flankings 25 $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_3prime_flankings_sense_assembled.fa
 	"""
 	
 	}

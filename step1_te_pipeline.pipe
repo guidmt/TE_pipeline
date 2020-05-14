@@ -153,14 +153,15 @@ filtering_3prime_from_blast_modern_definitive={
 
 fasta_reference_portion_variablelength={
 
+
 	exec """
 	     
-	perl $DIRECTORY_UTILS/fasta_reference_portion_VariableLength_new.pl $DIRECTORY_PROJECT/step1/processing/modern_3prime_sense_pos.txt modern_3prime_flanking_sense.fa down $FILE_REFERENCE;
-	perl $DIRECTORY_UTILS/fasta_reference_portion_VariableLength_new.pl $DIRECTORY_PROJECT/step1/processing/modern_3prime_antisense_pos.txt $output.dir/modern_3prime_flanking_antisense.fa up $FILE_REFERENCE;
-	perl $DIRECTORY_UTILS/fasta_reference_portion_VariableLength_new.pl $DIRECTORY_PROJECT/step1/processing/modern_5prime_sense_pos.txt $output.dir/modern_5prime_flanking_sense.fa down $FILE_REFERENCE;
-	perl $DIRECTORY_UTILS/fasta_reference_portion_VariableLength_new.pl $DIRECTORY_PROJECT/step1/processing/modern_5prime_antisense_pos.txt $output.dir/modern_5prime_flanking_antisense.fa up $FILE_REFERENCE;
-	perl $DIRECTORY_UTILS/fasta_reference_portion_VariableLength_new.pl $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_sense_pos.txt $output.dir/modern_filled_sites_sense.fa down $FILE_REFERENCE;
-	perl $DIRECTORY_UTILS/fasta_reference_portion_VariableLength_new.pl $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_antisense_pos.txt $output.dir/modern_filled_sites_antisense.fa up $FILE_REFENCE;
+	perl $DIRECTORY_UTILS/fasta_reference_portion_VariableLength_new.pl $DIRECTORY_PROJECT/step1/processing/modern_3prime_sense_pos.txt $DIRECTORY_PROJECT/step1/processing/modern_3prime_flanking_sense.fa down $FILE_REFERENCE;
+	perl $DIRECTORY_UTILS/fasta_reference_portion_VariableLength_new.pl $DIRECTORY_PROJECT/step1/processing/modern_3prime_antisense_pos.txt $DIRECTORY_PROJECT/step1/processing/modern_3prime_flanking_antisense.fa up $FILE_REFERENCE;
+	perl $DIRECTORY_UTILS/fasta_reference_portion_VariableLength_new.pl $DIRECTORY_PROJECT/step1/processing/modern_5prime_sense_pos.txt $DIRECTORY_PROJECT/step1/processing/modern_5prime_flanking_sense.fa down $FILE_REFERENCE;
+	perl $DIRECTORY_UTILS/fasta_reference_portion_VariableLength_new.pl $DIRECTORY_PROJECT/step1/processing/modern_5prime_antisense_pos.txt $DIRECTORY_PROJECT/step1/processing/modern_5prime_flanking_antisense.fa up $FILE_REFERENCE;
+	perl $DIRECTORY_UTILS/fasta_reference_portion_VariableLength_new.pl $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_sense_pos.txt $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_sense.fa down $FILE_REFERENCE;
+	perl $DIRECTORY_UTILS/fasta_reference_portion_VariableLength_new.pl $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_antisense_pos.txt $DIRECTORY_PROJECT/step1/processing/modern_filled_sites_antisense.fa up $FILE_REFENCE;
 
         """
 }
@@ -291,10 +292,9 @@ filtering_5prime_and_filled_sites_from_modern_specific_3prime={
 
 Bpipe.run{
 
-//create_subdir_project_step1+create_subdir_project_step2+create_subdir_project_step3+
-blast_index_archaic+blast_index_reference+blast_alignment_archaic+blast_alignment_retro_ref+seqkit_archaic+seqkit_archaic+sort_blastn_and_join_archaic+filtering_3prime_from_blast_archaic_definitive+cat_output_3prime_blast_archaic+filtering_3prime_from_blast_modern_definitive+fasta_reference_portion_variablelength
+//create_subdir_project_step1+create_subdir_project_step2+create_subdir_project_step3+blast_index_archaic+blast_index_reference+blast_alignment_archaic+blast_alignment_retro_ref+seqkit_archaic+seqkit_archaic+sort_blastn_and_join_archaic+filtering_3prime_from_blast_archaic_definitive+cat_output_3prime_blast_archaic+filtering_3prime_from_blast_modern_definitive+
 
-//remove_duplicates_flankings_and_filled_sites+blast_index_flank_archaic+blast_flanking_sense_modern_archaic+blast_flanking_antisense_modern_archaic+filtering_5prime_and_filled_sites_from_modern_specific_3prime
+fasta_reference_portion_variablelength+remove_duplicates_flankings_and_filled_sites+blast_index_flank_archaic+blast_flanking_sense_modern_archaic+blast_flanking_antisense_modern_archaic+filtering_5prime_and_filled_sites_from_modern_specific_3prime
 
 }
 

@@ -70,8 +70,8 @@ apply(tab_sense_filt,1,FUN=function(X,...){
 
       elen=as.numeric(X[4])
       numeroterzo=(as.numeric(X[10])+1)-elen-flalen
-      numeroquarto=elen+2*(flalen)
-
+      numeroquarto=2*(flalen)
+	
       riga_fs=paste(X[2],numeroterzo,numeroquarto,sep="\t")
       write(riga_fs,file=paste(output_string,"_filled_sites_sense_pos.txt",sep=""),append=T)
 
@@ -98,7 +98,7 @@ apply(tab_antisense_filt,1,FUN=function(X,...){
       
       elen=as.numeric(X[4])
       numeroterzo=(as.numeric(X[10])-1)+elen+flalen
-      numeroquarto=elen+2*(flalen)
+      numeroquarto=2*(flalen)
       
       riga_fs=paste(X[2],numeroterzo,numeroquarto,sep="\t")
       write(riga_fs,file=paste(output_string,"_filled_sites_antisense_pos.txt",sep=""),append=T)
