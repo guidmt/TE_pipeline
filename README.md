@@ -29,6 +29,12 @@ tmux attach-session -t step1_te_pipeline
 - abyssis [to check]
 
 # Updates:
+
+14/05/2020
+- debug step2
+- debug step1
+- upload generate_longer_reads_from_blasted_db_archaicGMTOK.R
+
 07/05/2020
 - update step2 bpipe
 - add filtering_5prime_from_blast_archaic_v2.R
