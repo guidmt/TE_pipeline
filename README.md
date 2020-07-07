@@ -29,6 +29,10 @@ tmux attach-session -t step1_te_pipeline
 - abyssis [to check]
 
 # Updates:
+07/07/2020
+- fix some errros in step1_te_pipeline.pipe
+- add steps step2_te_pipeline.pipe
+- start cleaning generate_longer_reads_from_blast_to_archaic
 
 14/05/2020
 - debug step2
