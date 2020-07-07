@@ -18,6 +18,17 @@ size_chunks_to_create<-round(number_of_rows_blastn/1000)
 
 idx<-split(data.frame(1:number_of_rows_blastn), rep(1:ceiling(number_of_rows_blastn/size_chunks_to_create), each=size_chunks_to_create, length.out=number_of_rows_blastn))
 
+output_string<-args[6]
+
+file_to_remove<-c(paste(output_string,"_3prime_sense_pos.txt",sep=""),
+paste(output_string,"_filled_sites_sense_pos.txt",sep=""),
+paste(output_string,"_5prime_sense_pos.txt",sep=""),
+paste(output_string,"_3prime_antisense_pos.txt",sep=""),
+paste(output_string,"_filled_sites_antisense_pos.txt",sep=""),
+paste(output_string,"_5prime_antisense_pos.txt",sep=""))
+
+system(paste("rm",file_to_remove))
+
 for(i in 1:length(idx)){
 
 print(i)
