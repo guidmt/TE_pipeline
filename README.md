@@ -29,6 +29,7 @@ tmux attach-session -t step1_te_pipeline
 - abyssis [to check]
 
 # Updates:
+07/07/2020
 
 14/05/2020
 - debug step2
