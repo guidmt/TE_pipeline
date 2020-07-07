@@ -44,27 +44,27 @@ tab_2=table_blastn[table_blastn[,4]>=mmele,]
 tab_sense=tab_2[(tab_2[,10]-tab_2[,9])>0,]
 tab_sense_2=tab_sense[(tab_sense[,13]-tab_sense[,8])<=maxdist,]
 tab_sense_filt=tab_sense_2[(tab_sense_2[,14]-tab_sense_2[,10])>=mmfla,]
+
 tab_antisense=tab_2[(tab_2[,10]-tab_2[,9])<0,]
 tab_antisense_2=tab_antisense[(tab_antisense[,13]-tab_antisense[,8])<=maxdist,]
 tab_antisense_filt=tab_antisense_2[tab_antisense_2[,10]>=mmfla,]
+
 tab_sense_filt=tab_sense_filt[order(tab_sense_filt[,3],decreasing=TRUE),]
 tab_antisense_filt=tab_antisense_filt[order(tab_antisense_filt[,3],decreasing=TRUE),]
 
 print(paste(Sys.time()," -> finished filtering the blastn output tab",sep=""))
 
+if(nrow(tab_sense_filt)>0){
+   
 apply(tab_sense_filt,1,FUN=function(X,...){
 
    pos_sense=NULL
-
+   
    riga=paste(X[2],(as.numeric(X[10])+1),length_flanking,sep="\t")
-
-   print("start selection")
-
+   
    output_string<-args[6]
 
    if (!is.element(riga,pos_sense[,1])) {
-
-      print(!is.element(riga,pos_sense[,1]))
 
       write(riga,file=paste(output_string,"_3prime_sense_pos.txt",sep=""),append=T)
 
@@ -75,21 +75,24 @@ apply(tab_sense_filt,1,FUN=function(X,...){
       riga_fs=paste(X[2],numeroterzo,numeroquarto,sep="\t")
       write(riga_fs,file=paste(output_string,"_filled_sites_sense_pos.txt",sep=""),append=T)
 
-      riga_5p=paste(tab_sense_filt[i,2],numeroterzo,length_flanking,sep="\t")
+      riga_5p=paste(X[2],numeroterzo,length_flanking,sep="\t")
       write(riga_5p,file=paste(output_string,"_5prime_sense_pos.txt",sep=""),append=T)
 
    }
+   
 }
 )
+}
+pos_antisense=NULL
 
+if(nrow(tab_antisense_filt)>0){
+   
 apply(tab_antisense_filt,1,FUN=function(X,...){
    
    pos_antisense=NULL
    
    riga=paste(X[2],(as.numeric(X[10])-1),length_flanking,sep="\t")
-   
-   print("start selection")
-   
+
    output_string<-args[6]
    
    if (!is.element(riga,pos_antisense[,1])) {
@@ -103,12 +106,14 @@ apply(tab_antisense_filt,1,FUN=function(X,...){
       riga_fs=paste(X[2],numeroterzo,numeroquarto,sep="\t")
       write(riga_fs,file=paste(output_string,"_filled_sites_antisense_pos.txt",sep=""),append=T)
       
-      riga_5p=paste(tab_sense_filt[i,2],numeroterzo,length_flanking,sep="\t")
+      riga_5p=paste(X[2],numeroterzo,length_flanking,sep="\t")
       write(riga_5p,file=paste(output_string,"_5prime_antisense_pos.txt",sep=""),append=T)
    
    }
 }
 )
+   
+}
 
 print(paste(Sys.time()," -> finished producing all the pos tabs!",sep=""))
 
