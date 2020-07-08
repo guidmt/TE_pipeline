@@ -15,7 +15,7 @@ tmux new -s step1_te_pipeline
 bpipe  step1_te_pipeline.bpipe
 ctrl+b+d
 
-recover session:
+recovering session:
 tmux attach-session -t step1_te_pipeline
 ```
 
