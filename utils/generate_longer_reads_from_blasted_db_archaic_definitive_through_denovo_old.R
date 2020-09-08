@@ -69,6 +69,7 @@ print(paste(Sys.time()," -> there are ",length(lev)," sites to assemble in batch
 assembled_3p_out=NULL
 assembled_5p_out=NULL
 empty_sites_out=NULL
+
 assembled_3p_out2=NULL
 assembled_5p_out2=NULL
 empty_sites_out2=NULL
@@ -114,8 +115,8 @@ for (i in 1:length(lev)) {
    system("cap3 temp_3p_to_assemble.fa")
    system("cap3 temp_5p_to_assemble.fa")
 
-   system("seqkit temp_3p_to_assemble.fa.cap.contigs > temp_3p_to_assemble.fa.cap.contigs.tab.fa")
-   system("seqkit temp_5p_to_assemble.fa.cap.contigs > temp_5p_to_assemble.fa.cap.contigs.tab.fa")
+   system("seqkit fx2tab temp_3p_to_assemble.fa.cap.contigs > temp_3p_to_assemble.fa.cap.contigs.tab.fa")
+   system("seqkit fx2tab temp_5p_to_assemble.fa.cap.contigs > temp_5p_to_assemble.fa.cap.contigs.tab.fa")
    
    system("wc -l temp_3p_to_assemble.fa.cap.contigs.tab.fa > temp_3p_number_var.txt")
    num3p=fread("temp_3p_number_var.txt",header=F,data.table=F)
@@ -171,10 +172,11 @@ for (i in 1:length(lev)) {
             }
             
             system("cap3 fasta_temp_both.fa")
-            system("seqkit fasta_temp_both.fa.cap.contigs > fasta_temp_both.cap.contigs.tab.fa")
+            system("seqkit fx2tab fasta_temp_both.fa.cap.contigs > fasta_temp_both.cap.contigs.tab.fa")
             
             system("wc -l fasta_temp_both.cap.contigs.tab.fa > temp_both_number_var.txt")
-            num_both=read.table("temp_both_number_var.txt",header=F)
+            
+            num_both=fread("temp_both_number_var.txt",data.table=F,header=T)
             
             if(nrow(num_both)==3){
                

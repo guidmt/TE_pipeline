@@ -12,13 +12,13 @@ args <- commandArgs(trailingOnly = TRUE)
 # 
 # Read the parameters from the command line
 # 
-senso=as.character(args[5])
+sense=as.character(args[5])
 mmele=as.numeric(args[3])
 mmfla=as.numeric(args[4])
 
 print(paste(Sys.time()," -> executing filtering_5prime_from_blast_archaic_v2.R script on file ",args[2]," ",args[5],sep=""))
 
-inputfile=paste("blasted_archaic_5prime_flanking_",senso,"_",as.character(args[1]),".txt",sep="")
+inputfile=paste("blasted_archaic_5prime_flanking_",sense,"_",as.character(args[1]),".txt",sep="")
 
 
 blastn_table_name=as.character(args[1])
@@ -59,7 +59,7 @@ for(i in 1:length(idx)){
       vector_to_use[seq(1,length(vector_to_use)-1,by=2)]<-tab_filt2[,2]
       vector_to_use[seq(2,length(vector_to_use),by=2)]<-tab_filt2[,ncol(tab_filt2)]
       
-      fasta_out=file(paste("putative_archaic_specific_5prime_reads_",senso,"_",as.character(args[1]),".fa",sep=""),"w")
+      fasta_out=file(paste("putative_archaic_specific_5prime_reads_",sense,"_",as.character(args[1]),".fa",sep=""),"w")
       
       writeLines(vector_to_use,con=fasta_out)
 
