@@ -34,6 +34,7 @@ blastn_putative_archaic_specific_3prime_flanking_sense={
 	}
 
 preprocessing_generate_longer_reads={
+	
 	exec """
 	seqkit fx2tab $DIRECTORY_PROJECT/step1/results/putative_archaic_specific_3prime_flanking_sense.fa > $DIRECTORY_PROJECT/step1/results/putative_archaic_specific_3prime_flanking_sense.tab.fa
 	"""
@@ -53,12 +54,12 @@ join_blastn_and_fa={
 generate_longer_reads_from_blasted_db_archaic={
 	
 	exec """
-	Rscript $DIRECTORY_UTILS/generate_longer_reads_from_blasted_db_archaic.R $DIRECTORY_PROJECT/step2/processing/blasted_3prime_flanking_for_generate_longer_reads_sense.input.txt 3prime sense flankings 25 $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_3prime_flankings_sense_assembled.fa
+	Rscript $DIRECTORY_UTILS/generate_longer_reads_from_blasted_db_archaicGMTOK.R $DIRECTORY_PROJECT/step2/processing/blasted_3prime_flanking_for_generate_longer_reads_sense.input.txt 3prime sense flankings 25 $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_3prime_flankings_sense_assembled.fa
 	"""
 	
 	}
 
-get_5_prime_and_empty={
+get_5_3_prime_and_empty={
 
 	exec """
 
@@ -73,12 +74,26 @@ get_5_prime_and_empty={
 }
 
 
+processing_before_filtering5prime_portions_of_modern_specific_empty_sites_sense={
+	
+	exec """
+	seqkit fx2tab $DIRECTORY_PROJECT/step1/results/empty_sites_sense.fa > $DIRECTORY_PROJECT/step1/results/empty_sites_sense.tab.fa;
+	seqkit fx2tab $DIRECTORY_PROJECT/step1/results/5prime_empty_site_sense.fa > $DIRECTORY_PROJECT/step1/results/5prime_empty_site_sense.tab.fa;
+	seqkit fx2tab $DIRECTORY_PROJECT/step1/results/3prime_empty_site_sense.fa > $DIRECTORY_PROJECT/step1/results/3prime_empty_site_sense.tab.fa;
+	seqkit fx2tab $DIRECTORY_PROJECT/step1/results/empty_sites_sense.fa > $DIRECTORY_PROJECT/step1/results/empty_sites_antisense.tab.fa;
+	seqkit fx2tab $DIRECTORY_PROJECT/step1/results/5prime_empty_site_sense.fa > $DIRECTORY_PROJECT/step1/results/5prime_empty_site_antisense.tab.fa;
+	seqkit fx2tab $DIRECTORY_PROJECT/step1/results/3prime_empty_site_sense.fa > $DIRECTORY_PROJECT/step1/results/3prime_empty_site_antisense.tab.fa;
+	"""
+
+}
+
+
 filtering_5prime_portions_of_modern_specific_empty_sites_sense={
 
 
 	exec """
 	
-	Rscript $DIRECTORY_UTILS/filtering_5prime_and_3prime_portions_of_modern_specific_empty_sites_v2.R empty_sites_sense.fa 5prime_empty_site_sense.fa 3prime_empty_site_sense.fa sense 
+	Rscript $DIRECTORY_UTILS/filtering_5prime_and_3prime_portions_of_modern_specific_empty_sites_v2.R empty_sites_sense.tab.fa 5prime_empty_site_sense.tab.fa prime_empty_site_sense.tab.fa sense 
 
 	"""
 }
@@ -89,30 +104,10 @@ filtering_5prime_portions_of_modern_specific_empty_sites_antisense={
 
         exec """
 
-        Rscript $DIRECTORY_UTILS/filtering_5prime_and_3prime_portions_of_modern_specific_empty_sites_v2.R empty_sites_antisense.fa 5prime_empty_site_antisense.fa 3prime_empty_site_antisense.fa antisense
+        Rscript $DIRECTORY_UTILS/filtering_5prime_and_3prime_portions_of_modern_specific_empty_sites_v2.R empty_sites_antisense.tab.fa 5prime_empty_site_antisense.tab.fa 3prime_empty_site_antisense.tab.fa antisense
 
         """
 }
-
-
-filtering_3prime_portions_of_modern_specific_empty_sites_sense={
-
-	exec """
-	Rscript $DIRECTORY_UTILS/filtering_5prime_and_3prime_portions_of_modern_specific_empty_sites_v2.R empty_sites_sense.fa 3prime_empty_site_sense.fa 3prime_empty_site_sense.fa sense
-
-	"""
-}
-
-
-filtering_3prime_portions_of_modern_specific_empty_sites_antisense={
-
-        exec """
-        Rscript $DIRECTORY_UTILS/filtering_5prime_and_3prime_portions_of_modern_specific_empty_sites_v2.R empty_sites_antisense.fa 3prime_empty_site_antisense.fa 3prime_empty_site_antisense.fa antisense
-
-        """
-
-}
-
 
 
 blastn_5prime_sense_put_flankings={
@@ -123,10 +118,10 @@ blastn_5prime_sense_put_flankings={
         echo $faf_name;
         echo $FILE_RETRO;
         blastn -query $DIRECTORY_PROJECT/step2/processing/5prime_sense_put_flankings.fa 
-	-db $faf 
-	-task blastn 
-	-outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen" -num_alignments 1000000000 -out $DIRECTORY_PROJECT/step2/processing/"blasted_archaic_5prime_flanking_sense_"$faf_name".txt";
-	done"""
+	      -db $faf 
+      	-task blastn 
+	      -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen" -num_alignments 1000000000 -out $DIRECTORY_PROJECT/step2/processing/"blasted_archaic_5prime_flanking_sense_"$faf_name".txt";
+		done"""
 	
 	}	
 
@@ -244,7 +239,9 @@ create_indices_empty_sites={
 
 	exec """
 	makeblastdb -in $DIRECTORY_PROJECT/step2/processing/5prime_sense_put_flankings.fa -dbtype nucl;
-	makeblastdb -in $DIRECTORY_PROJECT/step2/processing/3prime_sense_put_flankings.fa -dbtype nucl
+	makeblastdb -in $DIRECTORY_PROJECT/step2/processing/3prime_sense_put_flankings.fa -dbtype nucl;
+	makeblastdb -in $DIRECTORY_PROJECT/step2/processing/5prime_antisense_put_flankings.fa -dbtype nucl;
+	makeblastdb -in $DIRECTORY_PROJECT/step2/processing/3prime_antisense_put_flankings.fa -dbtype nucl
 	"""
 	
 	}
@@ -255,47 +252,20 @@ blast_archaic_3prime_vs_3prime_flanking={
 	exec """
 	blastn -query $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_3prime_reads_sense.fa -db 3prime_sense_put_flankings.fa -out $DIRECTORY_PROJECT/step2/processing/blasted_3prime_reads_for_assembly_sense.txt -perc_identity 90 -task blastn -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen" -num_alignments 1000000000;
 	blastn -query $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_5prime_reads_sense.fa -db 5prime_sense_put_flankings.fa -out $DIRECTORY_PROJECT/step2/processing/blasted_5prime_reads_for_assembly_sense.txt -perc_identity 90 -task blastn -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen" -num_alignments 1000000000;
-        blastn -query $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_3prime_reads_antisense.fa -db 3prime_antisense_put_flankings.fa -out $DIRECTORY_PROJECT/step2/processing/blasted_3prime_reads_for_assembly_antisense.txt -perc_identity 90 -task blastn -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen" -num_alignments 1000000000;
-        blastn -query $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_5prime_reads_antisense.fa -db 5prime_antisense_put_flankings.fa -out $DIRECTORY_PROJECT/step2/processing/blasted_5prime_reads_for_assembly_antisense.txt -perc_identity 90 -task blastn -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen" -num_alignments 1000000000;
+    blastn -query $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_3prime_reads_antisense.fa -db 3prime_antisense_put_flankings.fa -out $DIRECTORY_PROJECT/step2/processing/blasted_3prime_reads_for_assembly_antisense.txt -perc_identity 90 -task blastn -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen" -num_alignments 1000000000;
+    blastn -query $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_5prime_reads_antisense.fa -db 5prime_antisense_put_flankings.fa -out $DIRECTORY_PROJECT/step2/processing/blasted_5prime_reads_for_assembly_antisense.txt -perc_identity 90 -task blastn -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen" -num_alignments 1000000000;
 	"""
 }
 
-
-create_input_for_denovo_script={
-  exec """
-  seqkit fx2tab $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_new_names_5prime_reads_sense.fa > $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_new_names_5prime_reads_sense.tab.fa;
-  seqkit fx2tab $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_new_names_3prime_reads_sense.fa > $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_new_names_3prime_reads_sense.tab.fa;
-  seqkit fx2tab $DIRECTORY_PROJECT/step2/processing/reference_sorted_empty_sites_for_archaic_insertions_new_sense.fa > $DIRECTORY_PROJECT/step2/processing/reference_sorted_empty_sites_for_archaic_insertions_new_sense.tab.fa;
-  seqkit fx2tab $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_new_names_5prime_reads_antisense.fa > $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_new_names_5prime_reads_antisense.tab.fa;
-  seqkit fx2tab $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_new_names_3prime_reads_antisense.fa > $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_new_names_3prime_reads_antisense.tab.fa;
-  seqkit fx2tab $DIRECTORY_PROJECT/step2/processing/reference_sorted_empty_sites_for_archaic_insertions_new_antisense.fa > $DIRECTORY_PROJECT/step2/processing/reference_sorted_empty_sites_for_archaic_insertions_new_antisense.tab.fa;
-  """
-}
-
-generate_longer_reads_from_blasted_db_archaic_sense={
-
-
-Rscript $DIRECTORY_UTILS/generate_longer_reads_from_blasted_db_archaic_definitive_through_denovo_old.R  $DIRECTORY_PROJECT/step2/processing/blasted_5prime_for_denovo_assembly_sense.txt $DIRECTORY_PROJECT/step2/processing/blasted_3prime_for_denovo_assembly_sense.txt $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_new_names_5prime_reads_sense.fa $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_new_names_3prime_reads_sense.fa $DIRECTORY_PROJECT/step2/processing/reference_sorted_empty_sites_for_archaic_insertions_new_sense.fa 30 30 sense lowsen
-
-}
-
-generate_longer_reads_from_blasted_db_archaic_antisense={
-
-
-Rscript $DIRECTORY_UTILS/generate_longer_reads_from_blasted_db_archaic_definitive_through_denovo_old.R $DIRECTORY_PROJECT/step2/processing/blasted_5prime_for_denovo_assembly_sense.txt $DIRECTORY_PROJECT/step2/processing/blasted_3prime_for_denovo_assembly_antisense.txt $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_new_names_5prime_reads_antisense.fa $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_new_names_3prime_reads_antisense.fa $DIRECTORY_PROJECT/step2/processing/reference_sorted_empty_sites_for_archaic_insertions_new_antisense.fa 30 30 antisense lowsen
-
-}
-
-repeatmask={
-
-  """
-  echo "repeat mask"
-  """
+call_generate_longer_reads_from_blasted_db_archaic={
+	exec """
+	Rscript $DIRECTORY_UTILS/generate_longer_reads_from_blasted_db_archaic_definitive_through_denovo_old.R $DIRECTORY_PROJECT/step2/processing/blasted_5prime_for_denovo_assembly_sense.txt $DIRECTORY_PROJECT/step2/processing/blasted_3prime_for_denovo_assembly_sense.txt $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_new_names_5prime_reads_sense.fa $DIRECTORY_PROJECT/step2/processing/putative_archaic_specific_new_names_3prime_reads_sense.fa $DIRECTORY_PROJECT/step2/processing/reference_sorted_empty_sites_for_archaic_insertions_new_sense.fa 30 30 sense lowsen
+	"""
 }
 
 Bpipe.run{
 
-blastn_putative_archaic_specific_3prime_flanking_sense+preprocessing_generate_longer_reads+generate_longer_reads_from_blasted_db_archaic+get_5_prime_and_empty+filtering_5prime_portions_of_modern_specific_empty_sites_sense+filtering_5prime_portions_of_modern_specific_empty_sites_antisense+filtering_3prime_portions_of_modern_specific_empty_sites_sense+filtering_3prime_portions_of_modern_specific_empty_sites_antisense+blastn_5prime_sense_put_flankings+blastn_3prime_sense_put_flankings+blastn_5prime_antisense_put_flankings_repeatmasked+blastn_3prime_antisense_put_flankings_repeatmasked+filtering_5prime_from_blast_archaic_v2_sense+filtering_5prime_from_blast_archaic_v2_antisense+filtering_3prime_from_blast_archaic_v2_sense+filtering_3prime_from_blast_archaic_v2_antisense+create_indices_empty_sites+blast_archaic_3prime_vs_3prime_flanking+create_input_for_denovo_script+generate_longer_reads_from_blasted_db_archaic_sense+generate_longer_reads_from_blasted_db_archaic_antisense
+blastn_putative_archaic_specific_3prime_flanking_sense+preprocessing_generate_longer_reads+join_blastn_and_fa+generate_longer_reads_from_blasted_db_archaic+get_5_prime_and_empty+processing_before_filtering5prime_portions_of_modern_specific_empty_sites_sense+filtering_5prime_portions_of_modern_specific_empty_sites_sense+filtering_5prime_portions_of_modern_specific_empty_sites_antisense+blastn_5prime_sense_put_flankings+blastn_3prime_sense_put_flankings+blastn_5prime_antisense_put_flankings+blastn_3prime_antisense_put_flankings_repeatmasked+cat_5prime_3prime_antisense_put_flankings_repeatmasked+filtering_5prime_from_blast_archaic_v2_sense+filtering_5prime_from_blast_archaic_v2_antisense+filtering_3prime_from_blast_archaic_v2_sense+filtering_3prime_from_blast_archaic_v2_antisense+create_indices_empty_sites+blast_archaic_3prime_vs_3prime_flanking+call_generate_longer_reads_from_blasted_db_archaic
 
 }
 
