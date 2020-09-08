@@ -26,9 +26,15 @@ tmux attach-session -t step1_te_pipeline
 - R: readr, data.table
 - Perl
 - repeatmasker
-- abyssis [to check]
+- cap3 (last version, http://doua.prabi.fr/software/cap3)
 
 # Updates:
+
+08/09/2020
+- add steps step2_pipeline.pipe
+- add script R
+- modified filtering_5prime_and_3prime_portions_of_modern_specific_empty_sites_v2.R
+
 07/07/2020
 - fix some errros in step1_te_pipeline.pipe
 - add steps step2_te_pipeline.pipe
