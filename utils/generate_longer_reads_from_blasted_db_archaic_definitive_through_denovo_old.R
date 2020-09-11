@@ -170,7 +170,6 @@ for (i in 1:length(lev)) {
             }
             
             #  dove fasta_temp_both.fa e' genereato
-            
             system(paste("cap3 -k", args[10],"fasta_temp_both.fa"))
 
 
