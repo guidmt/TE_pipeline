@@ -10,7 +10,7 @@ library(data.table)
 # args[7] = minimum mismatch to consider in the blastn output table
 # args[8] = choose "sense" or "antisense"
 # args[9] = unique prefix of the temp files to produce
-
+# args[10] = cap3 (clipping 0 No 1 yes)
 
 args <- commandArgs(trailingOnly = TRUE)
 prefix=as.character(args[9])
@@ -171,7 +171,9 @@ for (i in 1:length(lev)) {
             
             #  dove fasta_temp_both.fa e' genereato
             
-            system("cap3 fasta_temp_both.fa")
+            system(paste("cap3 -k", args[10],"fasta_temp_both.fa"))
+
+
             system("seqkit fx2tab fasta_temp_both.fa.cap.contigs > fasta_temp_both.cap.contigs.tab.fa")
             
             system("wc -l fasta_temp_both.cap.contigs.tab.fa > temp_both_number_var.txt")
