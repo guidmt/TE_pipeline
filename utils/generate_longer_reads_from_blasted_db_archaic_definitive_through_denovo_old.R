@@ -195,7 +195,7 @@ for (i in 1:length(lev)) {
                
             } else {
                
-               assembled_both=read.table(paste(prefix,"fasta_temp_both.cap.contigs.tab.fa",sep=""),header=F,comment.char="",colClasses="character",sep="\t")
+               assembled_both=fread(paste(prefix,"fasta_temp_both.cap.contigs.tab.fa",sep=""),header=F,comment.char="",colClasses="character",sep="\t")
                
                for(ap0 in 1:nrow(assembled_both)){
                   
@@ -234,9 +234,6 @@ for (i in 1:length(lev)) {
    }
 }
 
-- TUTTI GLI OUT E out2 CREATI PRIMA DEVONO AVERE UNA CONNESSIONE DI USCITA 
-- DEVONO ANCHE AVERE I RISPETTIVI EMPTY SITES ESTRATTI DAI SITI VUOTI DELLA REFERENCE, DOVREBBERO MANTENERE LO STESSO SUFFISSO
-   
 print(paste(Sys.time()," -> finished assemblying the 3primes and 5primes for batch ",prefix,", now starting selection of empty sites and assembled filled sites portions...",sep=""))
 
 # Define a function to save the results
@@ -277,6 +274,7 @@ save_res_3p_5p<-function(es_out,ass_3p_out,ass_5_out,outesdef,out3pdef,out5pdef)
    
 }
 
+
 # output 3p_out_tab
 split_ass_3p_out=unlist(strsplit(ass_3p_out_tab[,1],split="_"))
 name_ass_3p_out=split_ass_3p_out[seq(4,length(split_ass_3p_out),by=4)]
@@ -304,6 +302,7 @@ outesdef=file(paste("modern_empty_sites_for_archaic_specific_filled_sites_",sens
 out3pdef=file(paste("archaic_specific_3prime_filled_sites_for_modern_empty_sites_",sense,"_",prefix,".fa",sep=""),"w")
 out5pdef=file(paste("archaic_specific_5prime_filled_sites_for_modern_empty_sites_",sense,"_",prefix,".fa",sep=""),"w")
 
+
 save_res_3p_5p(es_out=reads_es_tab,
                ass_3p_out=ass_3p_out_tab,
                ass_3p_out=ass_5p_out_tab,
@@ -318,28 +317,31 @@ save_res_3p_5p(es_out=reads_es_tab,
 outesout2=file(paste("possible_modern_empty_sites_for_archaic_specific_filled_sites_",sense,"_",prefix,".fa",sep=""),"w")
 out3pout2=file(paste("possible_archaic_specific_3prime_filled_sites_for_modern_empty_sites_",sense,"_",prefix,".fa",sep=""),"w")
 out5pout2=file(paste("possible_archaic_specific_5prime_filled_sites_for_modern_empty_sites_",sense,"_",prefix,".fa",sep=""),"w")
+   
+save_res_3p_5p(es=reads_es_tab,
+              out2_3p=ass_3p_out2_tab,
+              out2_5p=ass_5p_out2_tab,
+              outesout2=outesout2,
+              out3pout2=out3pout2,
+              out5pout2=out5pout2)
 
-reads_es_tab_out2=reads_es_tab[((is.element(reads_es_tab[,3],ass_3p_out2_tab[,3]))&(is.element(reads_es_tab[,3],ass_5p_out2_tab[,3]))),]
-ass_3p_out2_tab=ass_3p_out2_tab[is.element(ass_3p_out2_tab[,3],reads_es_tab_out2[,3]),]
-ass_5p_out2_tab=ass_5p_out2_tab[is.element(ass_5p_out2_tab[,3],reads_es_tab_out2[,3]),]
+#
+# Processing empty sites out 3
+#
 
+outesout2=file(paste("both_modern_empty_sites_for_archaic_specific_filled_sites_",sense,"_",prefix,".fa",sep=""),"w")
+out3pout2=file(paste("both_archaic_specific_3prime_filled_sites_for_modern_empty_sites_",sense,"_",prefix,".fa",sep=""),"w")
+out5pout2=file(paste("both_archaic_specific_5prime_filled_sites_for_modern_empty_sites_",sense,"_",prefix,".fa",sep=""),"w")
 
-- fare un codice simile a reads_es_tab_filt=reads_es_tab[((is.element(reads_es_tab[,3],ass_3p_out_tab[,3]))&(is.element(reads_es_tab[,3],ass_5p_out_tab[,3]))),]
-per both 
-
-
-
-for (n in 1:nrow(reads_es_tab_out2)) {
-   writeLines(as.character(reads_es_tab_out2[n,1]),con=outesout2)
-   writeLines(as.character(reads_es_tab_out2[n,2]),con=outesout2)
-   writeLines(as.character(ass_3p_out2_tab[n,1]),con=out3pout2)
-   writeLines(as.character(ass_3p_out2_tab[n,2]),con=out3pout2)
-   writeLines(as.character(ass_5p_out2_tab[n,1]),con=out5pout2)
-   writeLines(as.character(ass_5p_out2_tab[n,2]),con=out5pout2)
-}
-
-close(outesout2)
-close(out3pout2)
-close(out5pout2)
+save_res_3p_5p(es=reads_es_tab,
+               out2_3p=assembled_3p_out2,
+               out2_5p=assembled_3p_out2,
+               outesout2=outesout2,
+               out3pout2=out3pout2,
+               out5pout2=out5pout2)
 
 print(paste(Sys.time()," -> batch ",prefix, " IS DONE!     Buahahahahahaha!",sep=""))
+
+#- TUTTI GLI OUT E out2 CREATI PRIMA DEVONO AVERE UNA CONNESSIONE DI USCITA 
+#- DEVONO ANCHE AVERE I RISPETTIVI EMPTY SITES ESTRATTI DAI SITI VUOTI DELLA REFERENCE, DOVREBBERO MANTENERE LO STESSO SUFFISSO
+
