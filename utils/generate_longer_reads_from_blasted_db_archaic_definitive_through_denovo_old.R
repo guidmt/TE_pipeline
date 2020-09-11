@@ -16,20 +16,20 @@ args <- commandArgs(trailingOnly = TRUE)
 prefix=as.character(args[9])
 print(paste(Sys.time()," -> running script generate_longer_reads_from_blasted_db_archaic_definitive_through_denovo.R in batch ",prefix,sep=""))
 
-tab_5p_filt=fread(args[1],header=F,sep="\t",data.table=F)
+tab_5p_filt=fread(args[1],header=F,sep="\t",data.table=T)
 
 # get parameters minimum match and mismatch
 mmatch=as.numeric(args[6])
 mmele=as.numeric(args[7])
 sense=as.character(args[8])
-reads_5p_tab=fread(args[2],header=F,sep="\t",data.table=F)
+reads_5p_tab=fread(args[2],header=F,sep="\t",data.table=T)
 
 # get the file filtered 5prime, filtered 3prime
-reads_5p=fread(args[3],header=F,data.table=F)
-reads_3p_tab=fread(args[4],header=F,data.table=F)
+reads_5p=fread(args[3],header=F,data.table=T)
+reads_3p_tab=fread(args[4],header=F,data.table=T)
 
 # get the file with empty site
-reads_es_tab=fread(args[5],header=F,data.table=F)
+reads_es_tab=fread(args[5],header=F,data.table=T)
 
 tab_5p_filt=tab_5p_filt[tab_5p_filt[,4]>=mmatch,]
 tab_5p_filt=tab_5p_filt[(tab_5p_filt[,13]-tab_5p_filt[,4])>=mmele,]
@@ -119,36 +119,32 @@ for (i in 1:length(lev)) {
    system("seqkit fx2tab temp_5p_to_assemble.fa.cap.contigs > temp_5p_to_assemble.fa.cap.contigs.tab.fa")
    
    system("wc -l temp_3p_to_assemble.fa.cap.contigs.tab.fa > temp_3p_number_var.txt")
-   num3p=fread("temp_3p_number_var.txt",header=F,data.table=F)
+   num3p=fread("temp_3p_number_var.txt",header=F,data.table=T)
    
 
    system("wc -l temp_5p_to_assemble.fa.cap.contigs.tab.fa > temp_5p_number_var.txt")
-   num5p=fread("temp_5p_number_var.txt",header=F,data.table=F)
+   num5p=fread("temp_5p_number_var.txt",header=F,data.table=T)
    
    #
    # Criteri
    #
    
-   # se uno dei due siti e' vuoto andiamo avanti
-   
+
    # 
    #  Controlla se c'e' almeno una riga nei due file
    # 
-   if ((as.numeric(as.character(num3p[1,1]))>=1)&(as.numeric(as.character(num5p[1,1]))>=1)) {
+   if ((as.numeric(nrow(num3p))>=1)&(as.numeric(nrow(num5p))>=1)) {
    
       #
       # Se in entrambi i file le righe sono esattamente uguale a 1 -> omozigosi
       #
       if ((nrow(assembled_3p)==1)&(nrow(assembled_5p)==1)) {
          
-         assembled_3p=fread(paste(prefix,"temp_3p_to_assemble.fa.cap.contigs.tab.fa",sep=""),header=F,data.table=F)
-         assembled_5p=fread(paste(prefix,"temp_5p_to_assemble.fa.cap.contigs.tab.fa",sep=""),header=F,data.table=F)
+         ass_3p_out_tab=fread(paste(prefix,"temp_3p_to_assemble.fa.cap.contigs.tab.fa",sep=""),header=F,data.table=F)
+         ass_5p_out_tab=fread(paste(prefix,"temp_5p_to_assemble.fa.cap.contigs.tab.fa",sep=""),header=F,data.table=F)
          
-         assembled_3p_out=rbind(assembled_3p_out,paste(">assembled_fs_3prime_",as.character(lev[i]),sep=""))
-         assembled_3p_out=rbind(assembled_3p_out,as.character(assembled_3p[1,2]))
-         
-         assembled_5p_out=rbind(assembled_5p_out,paste(">assembled_fs_5prime_",as.character(lev[i]),sep=""))
-         assembled_5p_out=rbind(assembled_5p_out,as.character(assembled_5p[1,2]))
+         ass_3p_out_tab[1,1]<-paste(">assembled_fs_3prime_",as.character(lev[i]),sep="")
+         ass_5p_out_tab[1,1]<-paste(">assembled_fs_5prime_",as.character(lev[i]),sep="")
          
       } else { # no omozigosi
          
@@ -158,10 +154,12 @@ for (i in 1:length(lev)) {
          
          if ((nrow(assembled_3p)==2)&(nrow(assembled_5p)==2)) {
             
-            assembled_3p=fread(paste(prefix,"temp_3p_to_assemble.fa.cap.contigs.tab.fa",sep=""),header=F,data.table=F)
-            assembled_5p=fread(paste(prefix,"temp_5p_to_assemble.fa.cap.contigs.tab.fa",sep=""),header=F,data.table=F)
+            assembled_3p=fread(paste(prefix,"temp_3p_to_assemble.fa.cap.contigs.tab.fa",sep=""),header=F,data.table=T)
+            assembled_5p=fread(paste(prefix,"temp_5p_to_assemble.fa.cap.contigs.tab.fa",sep=""),header=F,data.table=T)
             
             temp_both<-rbind(temp_3p,temp_5p)
+      
+            #    Qui vedere output CAP
             
             for (k in 1:nrow(temp_both)) {
                
@@ -171,16 +169,18 @@ for (i in 1:length(lev)) {
                
             }
             
+            #  dove fasta_temp_both.fa e' genereato
+            
             system("cap3 fasta_temp_both.fa")
             system("seqkit fx2tab fasta_temp_both.fa.cap.contigs > fasta_temp_both.cap.contigs.tab.fa")
             
             system("wc -l fasta_temp_both.cap.contigs.tab.fa > temp_both_number_var.txt")
             
-            num_both=fread("temp_both_number_var.txt",data.table=F,header=T)
+            num_both=fread("temp_both_number_var.txt",data.table=T,header=T)
             
             if(nrow(num_both)==3){
                
-               assembled_both=fread(paste(prefix,"fasta_temp_both.cap.contigs.tab.fa",sep=""),data.table=F,header=F)
+               assembled_both=fread(paste(prefix,"fasta_temp_both.cap.contigs.tab.fa",sep=""),data.table=T,header=F)
                
                assembled_both_out=rbind(assembled_both_out,paste(">assembled_seq_a_",as.character(lev[i]),sep=""))
                assembled_both_out=rbind(assembled_both_out,as.character(assembled_3p[1,2]))
@@ -209,8 +209,8 @@ for (i in 1:length(lev)) {
       # else 2      
       } else {
             
-         assembled_3p_tab=fread(paste(prefix,"temp_3p_to_assemble.fa.cap.contigs.tab.fa",sep=""),header=F,data.table=F)
-         assembled_5p_tab=fread(paste(prefix,"temp_5p_to_assemble.fa.cap.contigs.tab.fa",sep=""),header=F,data.table=F)
+         assembled_3p_tab=fread(paste(prefix,"temp_3p_to_assemble.fa.cap.contigs.tab.fa",sep=""),header=F,data.table=T)
+         assembled_5p_tab=fread(paste(prefix,"temp_5p_to_assemble.fa.cap.contigs.tab.fa",sep=""),header=F,data.table=T)
                
          assembled_3p_tab_sort=assembled_3p_tab[order(nchar(assembled_3p_tab[,2]),decreasing=T),]
          assembled_5p_tab_sort=assembled_5p_tab[order(nchar(assembled_5p_tab[,2]),decreasing=T),]
@@ -239,87 +239,95 @@ for (i in 1:length(lev)) {
    
 print(paste(Sys.time()," -> finished assemblying the 3primes and 5primes for batch ",prefix,", now starting selection of empty sites and assembled filled sites portions...",sep=""))
 
-ass_3p_out_int=assembled_3p_out[seq(1,(nrow(assembled_3p_out))-1,by=2),1]
-ass_3p_out_seq=assembled_3p_out[seq(2,nrow(assembled_3p_out),by=2),1]
-ass_3p_out_tab=data.frame(ass_3p_out_int,ass_3p_out_seq,stringsAsFactors=F)
+# Define a function to save the results
+get_tab_from_seq<-function(x){
+   
+   x_int=x[seq(1,(nrow(x))-1,by=2),1]
+   x_seq=x[seq(2,nrow(x),by=2),1]
+   x_tab=data.frame(x_int,x_seq,stringsAsFactors=F)
+   x_out2=unlist(strsplit(x_tab[,1],split="_"))
+   x_out2=x_out2[seq(4,length(x_out2),by=4)]
+   x_tab=cbind(x_tab,x_out2)
+   
+   return(x_tab)
+      
+}
 
+# Define a function to perform subselection of two data.frames
+save_res_3p_5p<-function(es_out,ass_3p_out,ass_5_out,outesdef,out3pdef,out5pdef){
+   
+   es_out_filt=x[((is.element(x[,3],ass_3p_out[,3]))&(is.element(x[,3],ass_5_out[,3]))),]
+   ass_3p_out=ass_3p_out[is.element(ass_3p_out[,3],es_out[,3]),]
+   ass_5_out=ass_5_out[is.element(ass_5_out[,3],es_out_filt[,3]),]
+   
+   for(m in 1:nrow(ass_3p_out)){
+      
+      writeLines(as.character(es_out_filt[m,1]),con=outesdef)
+      writeLines(as.character(es_out_filt[m,2]),con=outesdef)
+      writeLines(as.character(ass_3p_out[m,1]),con=out3pdef)
+      writeLines(as.character(ass_3p_out[m,2]),con=out3pdef)
+      writeLines(as.character(ass_5_out[m,1]),con=out5pdef)
+      writeLines(as.character(ass_5_out[m,2]),con=out5pdef)
+      
+   }
+   
+   close(outesdef)
+   close(out3pdef)
+   close(out5pdef)
+   
+}
+
+# output 3p_out_tab
 split_ass_3p_out=unlist(strsplit(ass_3p_out_tab[,1],split="_"))
 name_ass_3p_out=split_ass_3p_out[seq(4,length(split_ass_3p_out),by=4)]
-
 ass_3p_out_tab=cbind(ass_3p_out_tab,name_ass_3p_out)
-ass_5p_out_int=assembled_5p_out[seq(1,(nrow(assembled_5p_out))-1,by=2),1]
-ass_5p_out_seq=assembled_5p_out[seq(2,nrow(assembled_5p_out),by=2),1]
-ass_5p_out_tab=data.frame(ass_5p_out_int,ass_5p_out_seq,stringsAsFactors=F)
 
+# output 5p_out_tab
 split_ass_5p_out=unlist(strsplit(ass_5p_out_tab[,1],split="_"))
 name_ass_5p_out=split_ass_5p_out[seq(4,length(split_ass_5p_out),by=4)]
-
 ass_5p_out_tab=cbind(ass_5p_out_tab,name_ass_5p_out)
-ass_3p_out2_int=assembled_3p_out2[seq(1,(nrow(assembled_3p_out2))-1,by=2),1]
-ass_3p_out2_seq=assembled_3p_out2[seq(2,nrow(assembled_3p_out2),by=2),1]
-ass_3p_out2_tab=data.frame(ass_3p_out2_int,ass_3p_out2_seq,stringsAsFactors=F)
 
-split_ass_3p_out2=unlist(strsplit(ass_3p_out2_tab[,1],split="_"))
-name_ass_3p_out2=split_ass_3p_out2[seq(4,length(split_ass_3p_out2),by=4)]
+# output 3p_out2
+ass_3p_out2_tab<-get_tab_from_seq(assembled_3p_out2)
 
-ass_3p_out2_tab=cbind(ass_3p_out2_tab,name_ass_3p_out2)
-ass_5p_out2_int=assembled_5p_out2[seq(1,(nrow(assembled_5p_out2))-1,by=2),1]
-ass_5p_out2_seq=assembled_5p_out2[seq(2,nrow(assembled_5p_out2),by=2),1]
-ass_5p_out2_tab=data.frame(ass_5p_out2_int,ass_5p_out2_seq,stringsAsFactors=F)
+# output 5p_out2
+ass_5p_out2_tab<-get_tab_from_seq(assembled_5p_out2)
 
-split_ass_5p_out2=unlist(strsplit(ass_5p_out2_tab[,1],split="_"))
-name_ass_5p_out2=split_ass_5p_out2[seq(4,length(split_ass_5p_out2),by=4)]
 
-ass_5p_out2_tab=cbind(ass_5p_out2_tab,name_ass_5p_out2)
 outesdef=file(paste("modern_empty_sites_for_archaic_specific_filled_sites_",sense,"_",prefix,".fa",sep=""),"w")
 
-reads_es_tab_filt=reads_es_tab[((is.element(reads_es_tab[,3],ass_3p_out_tab[,3]))&(is.element(reads_es_tab[,3],ass_5p_out_tab[,3]))),]
-ass_3p_out_tab=ass_3p_out_tab[is.element(ass_3p_out_tab[,3],reads_es_tab_filt[,3]),]
-ass_5p_out_tab=ass_5p_out_tab[is.element(ass_5p_out_tab[,3],reads_es_tab_filt[,3]),]
-
-reads_es_tab_out2=reads_es_tab[((is.element(reads_es_tab[,3],ass_3p_out2_tab[,3]))&(is.element(reads_es_tab[,3],ass_5p_out2_tab[,3]))),]
-ass_3p_out2_tab=ass_3p_out2_tab[is.element(ass_3p_out2_tab[,3],reads_es_tab_out2[,3]),]
-ass_5p_out2_tab=ass_5p_out2_tab[is.element(ass_5p_out2_tab[,3],reads_es_tab_out2[,3]),]
-system(paste("rm ",prefix,"_temp_*",sep=""))
-
-- fare un codice simile a reads_es_tab_filt=reads_es_tab[((is.element(reads_es_tab[,3],ass_3p_out_tab[,3]))&(is.element(reads_es_tab[,3],ass_5p_out_tab[,3]))),]
-per both 
+#
+# Processing empty sites out 1 
+#
 
 outesdef=file(paste("modern_empty_sites_for_archaic_specific_filled_sites_",sense,"_",prefix,".fa",sep=""),"w")
 out3pdef=file(paste("archaic_specific_3prime_filled_sites_for_modern_empty_sites_",sense,"_",prefix,".fa",sep=""),"w")
 out5pdef=file(paste("archaic_specific_5prime_filled_sites_for_modern_empty_sites_",sense,"_",prefix,".fa",sep=""),"w")
 
-- AGGIUNGERE  OUTPUT PER GLI ETEROZIGOTI (archaic_specific_ete_both_filled_sites)
-- equivalenete di outesdef per i both in eterozigosi
+save_res_3p_5p(es_out=reads_es_tab,
+               ass_3p_out=ass_3p_out_tab,
+               ass_3p_out=ass_5p_out_tab,
+               outesdef=outesdef,
+               out3pdef=out3pdef,
+               out5pdef=out5pdef)
 
-for (m in 1:nrow(reads_es_tab_filt)) {
-   writeLines(as.character(reads_es_tab_filt[m,1]),con=outesdef)
-   writeLines(as.character(reads_es_tab_filt[m,2]),con=outesdef)
-   writeLines(as.character(ass_3p_out_tab[m,1]),con=out3pdef)
-   writeLines(as.character(ass_3p_out_tab[m,2]),con=out3pdef)
-   writeLines(as.character(ass_5p_out_tab[m,1]),con=out5pdef)
-   writeLines(as.character(ass_5p_out_tab[m,2]),con=out5pdef)
-   - AGGIUNGERE 
-}
-
-close(outesdef)
-close(out3pdef)
-close(out5pdef)
+#
+# Processing empty sites out 2
+#
 
 outesout2=file(paste("possible_modern_empty_sites_for_archaic_specific_filled_sites_",sense,"_",prefix,".fa",sep=""),"w")
 out3pout2=file(paste("possible_archaic_specific_3prime_filled_sites_for_modern_empty_sites_",sense,"_",prefix,".fa",sep=""),"w")
 out5pout2=file(paste("possible_archaic_specific_5prime_filled_sites_for_modern_empty_sites_",sense,"_",prefix,".fa",sep=""),"w")
 
--aggiungere output both out2
+reads_es_tab_out2=reads_es_tab[((is.element(reads_es_tab[,3],ass_3p_out2_tab[,3]))&(is.element(reads_es_tab[,3],ass_5p_out2_tab[,3]))),]
+ass_3p_out2_tab=ass_3p_out2_tab[is.element(ass_3p_out2_tab[,3],reads_es_tab_out2[,3]),]
+ass_5p_out2_tab=ass_5p_out2_tab[is.element(ass_5p_out2_tab[,3],reads_es_tab_out2[,3]),]
 
-for (n in 1:nrow(reads_es_tab_out2)) {
-   writeLines(as.character(reads_es_tab_out2[n,1]),con=outesout2)
-   writeLines(as.character(reads_es_tab_out2[n,2]),con=outesout2)
-   writeLines(as.character(ass_3p_out2_tab[n,1]),con=out3pout2)
-   writeLines(as.character(ass_3p_out2_tab[n,2]),con=out3pout2)
-   writeLines(as.character(ass_5p_out2_tab[n,1]),con=out5pout2)
-   writeLines(as.character(ass_5p_out2_tab[n,2]),con=out5pout2)
-}
+
+- fare un codice simile a reads_es_tab_filt=reads_es_tab[((is.element(reads_es_tab[,3],ass_3p_out_tab[,3]))&(is.element(reads_es_tab[,3],ass_5p_out_tab[,3]))),]
+per both 
+
+
 
 for (n in 1:nrow(reads_es_tab_out2)) {
    writeLines(as.character(reads_es_tab_out2[n,1]),con=outesout2)
